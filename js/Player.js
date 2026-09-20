@@ -21,6 +21,9 @@ class Player {
 
         this.isGrounded = false;
 
+        this.isRolling = false;
+        this.rollSpeed = 180; 
+
         this.facingDir = 1;
 
         this.image = new Image();
@@ -33,16 +36,18 @@ class Player {
     update(deltaTime, input, platforms) {
         const previousY = this.y;
 
-        this.velocityX = 0;
+        if (!this.isRolling) {
+            this.velocityX = 0;
 
-        if (input.isPressed("ArrowLeft")) {
-            this.velocityX = -this.speed;
-            this.facingDir = -1;
-        }
+            if (input.isPressed("ArrowLeft")) {
+                this.velocityX = -this.speed;
+                this.facingDir = -1;
+            }
 
-        if (input.isPressed("ArrowRight")) {
-            this.velocityX = this.speed;
-            this.facingDir = 1;
+            if (input.isPressed("ArrowRight")) {
+                this.velocityX = this.speed;
+                this.facingDir = 1;
+            }
         }
 
         if (
@@ -51,6 +56,16 @@ class Player {
         ) {
             this.velocityY = -this.jumpStrength;
             this.isGrounded = false;
+        }
+
+        if (
+            input.isJustPressed("ShiftLeft") &&
+            this.isGrounded &&
+            !this.isRolling
+        ) {
+            this.isRolling = true;
+            this.velocityX = this.facingDir * this.rollSpeed;
+            this.setAnimation("roll");
         }
 
         if (!this.isGrounded) {
@@ -76,7 +91,9 @@ class Player {
             }
         }
 
-        if (!this.isGrounded) {
+        if (this.isRolling) {
+            this.setAnimation("roll");
+        }else if (!this.isGrounded) {
             if (this.velocityY < 0) {
                 this.setAnimation("jump");
             } else {
@@ -89,6 +106,13 @@ class Player {
         }
 
         this.animations[this.currentAnimation].update(deltaTime);
+
+        if (
+            this.isRolling &&
+            this.animations.roll.isFinished()
+        ) {
+            this.isRolling = false;
+        }
 
     }
 

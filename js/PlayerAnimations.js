@@ -56,6 +56,26 @@ function createPlayerAnimations(image) {
                 32,
                 [[0,2]],
                 0.1
+        ),
+
+        roll: new Animation(
+                image,
+                32,
+                32,
+                [
+                    [0, 5],
+                    [1, 5],
+                    [2, 5],
+                    [3, 5],
+                    [4, 5],
+                    [5, 5],
+                    [6, 5],
+                    [7, 5],
+                    [0, 6],
+                    [1, 6]
+                ],
+                0.06,
+                false
         )
     };
 }
