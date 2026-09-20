@@ -1,14 +1,13 @@
 class Animation {
-    constructor(image, frameWidth, frameHeight, frameCount, frameDuration, row) {
+    constructor(image, frameWidth, frameHeight, frames, frameDuration, loop = true) {
         this.image = image;
 
         this.frameWidth = frameWidth;
         this.frameHeight = frameHeight;
 
-        this.frameCount = frameCount;
+        this.frames = frames;
         this.frameDuration = frameDuration;
-
-        this.row = row;
+        this.loop = loop;
 
         this.currentFrame = 0;
         this.elapsedTime = 0;
@@ -22,10 +21,21 @@ class Animation {
 
             this.currentFrame++;
 
-            if (this.currentFrame >= this.frameCount) {
-                this.currentFrame = 0;
+            if (this.currentFrame >= this.frames.length) {
+                if (this.loop) {
+                    this.currentFrame = 0;
+                } else {
+                    this.currentFrame = this.frames.length - 1;
+                }
             }
         }
+    }
+
+    isFinished() {
+        return (
+            !this.loop && 
+            this.currentFrame === this.frames.length - 1
+        );
     }
 
     reset() {
@@ -34,8 +44,10 @@ class Animation {
     }
 
     draw(context, x, y, width, height) {
-        const sourceX = this.currentFrame * this.frameWidth;
-        const sourceY = this.row * this.frameHeight;
+        const [col, row] = this.frames[this.currentFrame];
+
+        const sourceX = col * this.frameWidth;
+        const sourceY = row * this.frameHeight;
 
         context.drawImage(
             this.image, 

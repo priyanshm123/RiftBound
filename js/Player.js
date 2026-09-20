@@ -33,14 +33,6 @@ class Player {
     update(deltaTime, input, platforms) {
         const previousY = this.y;
 
-        if (this.velocityX === 0) {
-            this.setAnimation("idle");
-        } else {
-            this.setAnimation("run");
-        }
-
-        this.animations[this.currentAnimation].update(deltaTime);
-
         this.velocityX = 0;
 
         if (input.isPressed("ArrowLeft")) {
@@ -83,6 +75,20 @@ class Player {
                 this.isGrounded = true;
             }
         }
+
+        if (!this.isGrounded) {
+            if (this.velocityY < 0) {
+                this.setAnimation("jump");
+            } else {
+                this.setAnimation("fall");
+            }
+        } else if (this.velocityX === 0) {
+            this.setAnimation("idle");
+        } else {
+            this.setAnimation("run");
+        }
+
+        this.animations[this.currentAnimation].update(deltaTime);
 
     }
 
