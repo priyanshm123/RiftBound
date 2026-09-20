@@ -9,11 +9,8 @@ canvas.height = 180;
 const input = new Input();
 const player = new Player(50, 50);
 
-const platforms = [
-    new Platform(0, 150, 320, 30),
-    new Platform(100, 110, 80, 10),
-    new Platform(220, 80, 70, 10)
-];
+const room = new Room();
+const platforms = room.createPlatforms();
 
 const game = {
     lastTime: 0, 
@@ -25,6 +22,8 @@ const game = {
 
     draw() {
         context.clearRect(0, 0, canvas.width, canvas.height);
+
+        room.draw(context);
 
         for (const platform of platforms) {
             platform.draw(context);
