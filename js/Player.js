@@ -21,33 +21,36 @@ class Player {
 
         this.isGrounded = false;
 
+        this.facingDir = 1;
+
         this.image = new Image();
         this.image.src = "assests/sprites/knight.png"
 
-        this.idleAnimation = new Animation(
-            this.image,
-            32,
-            32,
-            4,
-            0.15,
-            0
-        )
-
+        this.animations = createPlayerAnimations(this.image);
+        this.currentAnimation = "idle";
     }
 
     update(deltaTime, input, platforms) {
         const previousY = this.y;
 
-        this.idleAnimation.update(deltaTime);
+        if (this.velocityX === 0) {
+            this.setAnimation("idle");
+        } else {
+            this.setAnimation("run");
+        }
+
+        this.animations[this.currentAnimation].update(deltaTime);
 
         this.velocityX = 0;
 
         if (input.isPressed("ArrowLeft")) {
             this.velocityX = -this.speed;
+            this.facingDir = -1;
         }
 
         if (input.isPressed("ArrowRight")) {
             this.velocityX = this.speed;
+            this.facingDir = 1;
         }
 
         if (
@@ -58,10 +61,18 @@ class Player {
             this.isGrounded = false;
         }
 
-        this.velocityY += this.gravity * deltaTime;
+        if (!this.isGrounded) {
+            this.velocityY += this.gravity * deltaTime;
+
+        }
         
         this.x += this.velocityX * deltaTime;
         this.y += this.velocityY * deltaTime;
+
+        this.x = Math.max(
+            0,
+            Math.min(this.x, 320 - this.width)
+        );
 
         this.isGrounded = false;
 
@@ -94,13 +105,38 @@ class Player {
         );
     }
 
+    setAnimation(name) {
+        if (this.currentAnimation !== name) {
+            this.currentAnimation = name;
+            this.animations[name].reset();
+        }
+    }
+
     draw(context) {
-       this.idleAnimation.draw(
-            context,
-            Math.round(this.x - 6),
-            Math.round(this.y),
-            this.spriteWidth,
-            this.spriteHeight
-       );
+       const animation = this.animations[this.currentAnimation];
+
+       context.save();
+
+       if (this.facingDir === -1) {
+            context.scale(-1, 1);
+
+            animation.draw(
+                context,
+                -Math.round(this.x + this.spriteWidth - 6),
+                Math.round(this.y),
+                this.spriteWidth,
+                this.spriteHeight
+            );
+       } else {
+            animation.draw(
+                context,
+                Math.round(this.x - 6),
+                Math.round(this.y),
+                this.spriteWidth,
+                this.spriteHeight
+            );
+       }
+
+       context.restore();
     }
 }
