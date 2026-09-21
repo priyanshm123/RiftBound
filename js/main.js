@@ -6,44 +6,75 @@ context.imageSmoothingEnabled = false;
 canvas.width = 320;
 canvas.height = 180;
 
-const input = new Input();
-const player = new Player(50, 50);
 
-const room = new Room();
-const platforms = room.createPlatforms();
+async function startGame() {
+    try {
+        const response = await fetch("assests/data/tiles.json");
 
-const game = {
-    lastTime: 0, 
-
-    update(deltaTime) {
-        player.update(deltaTime, input, platforms);
-
-    }, 
-
-    draw() {
-        context.clearRect(0, 0, canvas.width, canvas.height);
-
-        room.draw(context);
-
-        for (const platform of platforms) {
-            platform.draw(context);
+        if (!response.ok) {
+            throw new Error(`Failed to load tiles.json: ${response.status}`);
         }
 
-        player.draw(context);
+        const tiles = await response.json();
+
+        const input = new Input();
+
+        const room = new Room(
+            ROOM_TEMPLATES[0],
+            tiles
+        );
+
+        const player = new Player(
+            room.playerSpawn.x,
+            room.playerSpawn.y
+        );
+
+        const game = {
+            lastTime: 0,
+
+            update(deltaTime) {
+                player.update(
+                    deltaTime,
+                    input,
+                    room.platforms
+                );
+            },
+
+            draw() {
+                context.clearRect(
+                    0,
+                    0,
+                    canvas.width,
+                    canvas.height
+                );
+
+                room.draw(context);
+                player.draw(context);
+            }
+        };
+
+        function gameLoop(currentTime) {
+            const deltaTime =
+                game.lastTime === 0
+                    ? 0
+                    : (currentTime - game.lastTime) / 1000;
+
+            game.lastTime = currentTime;
+
+            game.update(deltaTime);
+
+            input.endFrame();
+            game.draw();
+
+            requestAnimationFrame(gameLoop);
+        }
+
+        requestAnimationFrame(gameLoop);
+
+    } catch (error) {
+        console.error("Failed to start RiftBound:", error);
     }
-
-};
-
-function gameLoop(currentTime) {
-    const deltaTime = (currentTime - game.lastTime) / 1000;
-
-    game.lastTime = currentTime;
-
-    game.update(deltaTime);
-    input.endFrame();
-    game.draw();
-
-    requestAnimationFrame(gameLoop);
 }
 
-requestAnimationFrame(gameLoop);
+startGame();
+

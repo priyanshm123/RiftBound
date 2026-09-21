@@ -1,0 +1,8 @@
+{
+    "empty": -1,
+
+    "grass": 0,
+    "dirt": 1,
+    "dirt_alt": 16,
+    "dirt_dark": 17
+}

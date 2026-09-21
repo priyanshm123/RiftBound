@@ -1,141 +1,102 @@
-const TILE = {
-    EMPTY: -1,
-
-    GRASS_TOP: 0,
-    DIRT_1: 1,
-    DIRT_2: 16,
-    DIRT_3: 17
-};
-
 class Room {
-    constructor() {
-        this.tileSize = 16;
+    constructor(template, tiles) {
+        this.template = template;
+        this.tiles = tiles;
 
-       this.tiles = [
-            [TILE.EMPTY, TILE.EMPTY, TILE.EMPTY, TILE.EMPTY, TILE.EMPTY,
-            TILE.EMPTY, TILE.EMPTY, TILE.EMPTY, TILE.EMPTY, TILE.EMPTY,
-            TILE.EMPTY, TILE.EMPTY, TILE.EMPTY, TILE.EMPTY, TILE.EMPTY,
-            TILE.EMPTY, TILE.EMPTY, TILE.EMPTY, TILE.EMPTY, TILE.EMPTY],
-
-            [TILE.EMPTY, TILE.EMPTY, TILE.EMPTY, TILE.EMPTY, TILE.EMPTY,
-            TILE.EMPTY, TILE.EMPTY, TILE.EMPTY, TILE.EMPTY, TILE.EMPTY,
-            TILE.EMPTY, TILE.EMPTY, TILE.EMPTY, TILE.EMPTY, TILE.EMPTY,
-            TILE.EMPTY, TILE.EMPTY, TILE.EMPTY, TILE.EMPTY, TILE.EMPTY],
-
-            [TILE.EMPTY, TILE.EMPTY, TILE.EMPTY, TILE.EMPTY, TILE.EMPTY,
-            TILE.EMPTY, TILE.EMPTY, TILE.EMPTY, TILE.EMPTY, TILE.EMPTY,
-            TILE.EMPTY, TILE.EMPTY, TILE.EMPTY, TILE.EMPTY, TILE.EMPTY,
-            TILE.EMPTY, TILE.EMPTY, TILE.EMPTY, TILE.EMPTY, TILE.EMPTY],
-
-            [TILE.EMPTY, TILE.EMPTY, TILE.EMPTY, TILE.EMPTY, TILE.EMPTY,
-            TILE.EMPTY, TILE.EMPTY, TILE.EMPTY, TILE.EMPTY, TILE.EMPTY,
-            TILE.EMPTY, TILE.EMPTY, TILE.EMPTY, TILE.EMPTY, TILE.EMPTY,
-            TILE.EMPTY, TILE.EMPTY, TILE.EMPTY, TILE.EMPTY, TILE.EMPTY],
-
-            [TILE.EMPTY, TILE.EMPTY, TILE.EMPTY, TILE.EMPTY, TILE.EMPTY,
-            TILE.EMPTY, TILE.EMPTY, TILE.EMPTY, TILE.EMPTY, TILE.EMPTY,
-            TILE.EMPTY, TILE.EMPTY, TILE.EMPTY, TILE.EMPTY, TILE.EMPTY,
-            TILE.EMPTY, TILE.EMPTY, TILE.EMPTY, TILE.EMPTY, TILE.EMPTY],
-
-            [TILE.EMPTY, TILE.EMPTY, TILE.EMPTY, TILE.EMPTY, TILE.EMPTY,
-            TILE.EMPTY, TILE.EMPTY, TILE.EMPTY, TILE.EMPTY, TILE.EMPTY,
-            TILE.EMPTY, TILE.EMPTY, TILE.EMPTY, TILE.EMPTY, TILE.EMPTY,
-            TILE.EMPTY, TILE.EMPTY, TILE.EMPTY, TILE.EMPTY, TILE.EMPTY],
-
-            [TILE.EMPTY, TILE.EMPTY, TILE.EMPTY, TILE.EMPTY, TILE.EMPTY,
-            TILE.EMPTY, TILE.EMPTY, TILE.EMPTY, TILE.EMPTY, TILE.EMPTY,
-            TILE.EMPTY, TILE.EMPTY, TILE.EMPTY, TILE.EMPTY, TILE.EMPTY,
-            TILE.EMPTY, TILE.EMPTY, TILE.EMPTY, TILE.EMPTY, TILE.EMPTY],
-
-            [TILE.EMPTY, TILE.EMPTY, TILE.EMPTY, TILE.EMPTY, TILE.EMPTY,
-            TILE.EMPTY, TILE.EMPTY, TILE.EMPTY, TILE.EMPTY, TILE.EMPTY,
-            TILE.EMPTY, TILE.EMPTY, TILE.EMPTY, TILE.EMPTY, TILE.EMPTY,
-            TILE.EMPTY, TILE.EMPTY, TILE.EMPTY, TILE.EMPTY, TILE.EMPTY],
-
-            [TILE.EMPTY, TILE.EMPTY, TILE.EMPTY, TILE.EMPTY, TILE.EMPTY,
-            TILE.EMPTY, TILE.EMPTY, TILE.EMPTY, TILE.EMPTY, TILE.EMPTY,
-            TILE.EMPTY, TILE.EMPTY, TILE.EMPTY, TILE.EMPTY, TILE.EMPTY,
-            TILE.EMPTY, TILE.EMPTY, TILE.EMPTY, TILE.EMPTY, TILE.EMPTY],
-
-            [TILE.GRASS_TOP, TILE.GRASS_TOP, TILE.GRASS_TOP, TILE.GRASS_TOP, TILE.GRASS_TOP,
-            TILE.GRASS_TOP, TILE.GRASS_TOP, TILE.GRASS_TOP, TILE.GRASS_TOP, TILE.GRASS_TOP,
-            TILE.GRASS_TOP, TILE.GRASS_TOP, TILE.GRASS_TOP, TILE.GRASS_TOP, TILE.GRASS_TOP,
-            TILE.GRASS_TOP, TILE.GRASS_TOP, TILE.GRASS_TOP, TILE.GRASS_TOP, TILE.GRASS_TOP],
-
-            [TILE.DIRT_1, TILE.DIRT_2, TILE.DIRT_3, TILE.DIRT_1, TILE.DIRT_2,
-            TILE.DIRT_3, TILE.DIRT_1, TILE.DIRT_2, TILE.DIRT_3, TILE.DIRT_1,
-            TILE.DIRT_2, TILE.DIRT_3, TILE.DIRT_1, TILE.DIRT_2, TILE.DIRT_3,
-            TILE.DIRT_1, TILE.DIRT_2, TILE.DIRT_3, TILE.DIRT_1, TILE.DIRT_2],
-
-            [TILE.DIRT_2, TILE.DIRT_3, TILE.DIRT_1, TILE.DIRT_2, TILE.DIRT_3,
-            TILE.DIRT_1, TILE.DIRT_2, TILE.DIRT_3, TILE.DIRT_1, TILE.DIRT_2,
-            TILE.DIRT_3, TILE.DIRT_1, TILE.DIRT_2, TILE.DIRT_3, TILE.DIRT_1,
-            TILE.DIRT_2, TILE.DIRT_3, TILE.DIRT_1, TILE.DIRT_2, TILE.DIRT_3]
-        ];
-
-        this.platformData = [
-            {
-                x: 0,
-                y: 144,
-                width: 320,
-                height: 32
-            },
-            {
-                x: 96,
-                y: 112,
-                width: 80,
-                height: 16
-            },
-            {
-                x: 224,
-                y: 80,
-                width: 80,
-                height: 16
-            }
-        ];
+        this.width = ROOM_WIDTH;
+        this.height = ROOM_HEIGHT;
+        this.tileSize = TILE_SIZE;
 
         this.image = new Image();
         this.image.src = "assests/sprites/world_tileset.png";
+
+        this.tileMap = this.createTileMap();
+        this.platforms = this.createPlatforms();
+
+        this.playerSpawn = {
+            x: template.playerSpawn.x * this.tileSize,
+            y: template.playerSpawn.y * this.tileSize
+        };
+    }
+
+    createTileMap() {
+        const map = Array.from(
+            { length: this.height },
+            () => Array(this.width).fill(this.tiles.empty)
+        );
+
+        const ground = this.template.ground;
+
+        for (let x = 0; x < this.width; x++) {
+            map[ground.row][x] = this.tiles[ground.top];
+
+            for (let y = ground.row + 1; y < this.height; y++) {
+                const fillIndex =
+                    (y - ground.row - 1) % ground.fill.length;
+
+                map[y][x] = this.tiles[
+                    ground.fill[fillIndex]
+                ];
+            }
+        }
+
+        return map;
     }
 
     createPlatforms() {
-        return this.platformData.map(
-            platform => 
+        const ground = this.template.ground;
+
+        const platforms = [
+            new Platform(
+                0,
+                ground.row * this.tileSize,
+                this.width * this.tileSize,
+                this.tileSize
+            )
+        ];
+
+        for (const data of this.template.platforms) {
+            platforms.push(
                 new Platform(
-                    platform.x,
-                    platform.y,
-                    platform.width,
-                    platform.height
+                    data.x * this.tileSize,
+                    data.y * this.tileSize,
+                    data.width * this.tileSize,
+                    this.tileSize
                 )
-        );
+            );
+        }
+
+        return platforms;
     }
 
-    draw(context) {
-        for (let row = 0; row < this.tiles.length; row++) {
-            for (let col = 0; col < this.tiles[row].length; col++) {
-                const tile = this.tiles[row][col];
+    draw(ctx) {
+        for (let y = 0; y < this.height; y++) {
+            for (let x = 0; x < this.width; x++) {
+                const tile = this.tileMap[y][x];
 
-                if (tile === TILE.EMPTY) {
+                if (tile === this.tiles.empty) {
                     continue;
                 }
 
                 const sourceColumn = tile % 16;
                 const sourceRow = Math.floor(tile / 16);
 
-                context.drawImage(
+                ctx.drawImage(
                     this.image,
-
-                    sourceColumn * this.tileSize,
-                    sourceRow * this.tileSize,
-                    this.tileSize,
-                    this.tileSize,
-
-                    col * this.tileSize,
-                    row * this.tileSize,
+                    sourceColumn * 16,
+                    sourceRow * 16,
+                    16,
+                    16,
+                    x * this.tileSize,
+                    y * this.tileSize,
                     this.tileSize,
                     this.tileSize
                 );
             }
+        }
+
+        for (const platform of this.platforms) {
+            platform.draw(ctx);
         }
     }
 }
