@@ -62,7 +62,10 @@ async function startGame() {
             const deltaTime =
                 game.lastTime === 0
                     ? 0
-                    : (currentTime - game.lastTime) / 1000;
+                    : Math.min(
+                        (currentTime - game.lastTime) / 1000,
+                        0.05
+                    );
 
             game.lastTime = currentTime;
 
