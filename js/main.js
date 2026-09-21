@@ -30,10 +30,12 @@ async function startGame() {
       update(deltaTime) {
         player.update(deltaTime, input, room.platforms);
 
-        slime.update(deltaTime, room.platforms, player);
+        if (!slime.isDead) {
+          slime.update(deltaTime, room.platforms, player);
+        }
 
         if (player.isAttackingEnemy(slime) && !player.hasHitEnemy) {
-          slime.takeDamage(player.attackDamage);
+          slime.takeDamage(player.attackDamage, player.facingDir);
           player.hasHitEnemy = true;
         }
       },
@@ -43,7 +45,9 @@ async function startGame() {
 
         room.draw(context);
         player.draw(context);
-        slime.draw(context);
+        if(!slime.isDead) {
+          slime.draw(context);
+        }
       },
     };
 

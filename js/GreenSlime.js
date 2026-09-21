@@ -13,6 +13,7 @@ class GreenSlime extends Enemy {
 
     this.hitTimer = 0;
     this.hitDuration = 0.2;
+    this.knockbackSpeed = 80;
 
     this.image = new Image();
     this.image.src = "assests/sprites/slime_green.png";
@@ -64,8 +65,14 @@ class GreenSlime extends Enemy {
 
   update(deltaTime, platforms, player) {
 
+    if (this.isDead) {
+      this.velocityX = 0;
+
+      this.animations[this.currentAnimation].update(deltaTime);
+      return;
+    }
+
     if (this.isHit) {
-        this.velocityX = 0;
 
         this.hitTimer -= deltaTime;
 
@@ -128,15 +135,20 @@ class GreenSlime extends Enemy {
     this.animations[this.currentAnimation].update(deltaTime);
   }
 
-  takeDamage(amount) {
+  takeDamage(amount, attackDirection) {
     super.takeDamage(amount);
 
     if (this.isDead) {
+        this.velocityX = 0;
+        this.setAnimation("hit");
         return;
     }
 
     this.isHit = true;
     this.hitTimer = this.hitDuration;
+
+    this.velocityX = 
+        attackDirection * this.knockbackSpeed;
 
     this.setAnimation("hit");
   }
