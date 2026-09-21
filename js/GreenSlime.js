@@ -6,8 +6,13 @@ class GreenSlime extends Enemy {
     this.direction = 1;
 
     this.state = "patrol";
+    this.isHit = false;
+    
     this.detectionRange = 80;
     this.verticalTolerance = 4;
+
+    this.hitTimer = 0;
+    this.hitDuration = 0.2;
 
     this.image = new Image();
     this.image.src = "assests/sprites/slime_green.png";
@@ -58,6 +63,23 @@ class GreenSlime extends Enemy {
   }
 
   update(deltaTime, platforms, player) {
+
+    if (this.isHit) {
+        this.velocityX = 0;
+
+        this.hitTimer -= deltaTime;
+
+        if (this.hitTimer <= 0) {
+            this.hitTimer = 0;
+            this.isHit = false;
+        }
+
+        this.updatePhysics(deltaTime, platforms);
+
+        this.animations[this.currentAnimation].update(deltaTime);
+
+        return;
+    } 
     const detected = this.canDetectPlayer(player);
 
     const sameHeight = this.isAtPlayerHeight(player);
@@ -106,6 +128,19 @@ class GreenSlime extends Enemy {
     this.animations[this.currentAnimation].update(deltaTime);
   }
 
+  takeDamage(amount) {
+    super.takeDamage(amount);
+
+    if (this.isDead) {
+        return;
+    }
+
+    this.isHit = true;
+    this.hitTimer = this.hitDuration;
+
+    this.setAnimation("hit");
+  }
+
   isEdgeAhead(platforms) {
     const lookAhead = this.direction * 2;
 
@@ -135,14 +170,14 @@ class GreenSlime extends Enemy {
     const slimeCenterY =
         this.y + this.height / 2;
 
-        const playerCenterY =
-            player.y + player.height / 2;
+    const playerCenterY =
+        player.y + player.height / 2;
 
-        return (
-            Math.abs(slimeCenterY - playerCenterY) <=
+    return (
+        Math.abs(slimeCenterY - playerCenterY) <=
             this.verticalTolerance
-        );
-    }
+    );
+}
 
   canDetectPlayer(player) {
     const slimeCenterX = this.x + this.width / 2;

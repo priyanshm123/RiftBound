@@ -15,6 +15,6 @@ class Enemy extends Entity {
             this.health = 0;
             this.isDead = true;
         }
-    }
 
+    }
 }
