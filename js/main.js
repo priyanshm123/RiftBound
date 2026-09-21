@@ -29,6 +29,8 @@ async function startGame() {
             room.playerSpawn.y
         );
 
+        const slime = new GreenSlime(180, 123) ;
+
         const game = {
             lastTime: 0,
 
@@ -38,6 +40,8 @@ async function startGame() {
                     input,
                     room.platforms
                 );
+
+                slime.update(deltaTime, room.platforms, player);
             },
 
             draw() {
@@ -50,6 +54,7 @@ async function startGame() {
 
                 room.draw(context);
                 player.draw(context);
+                slime.draw(context);
             }
         };
 
