@@ -1,25 +1,12 @@
-class Player {
+class Player extends Entity {
   constructor(x, y) {
-    this.x = x;
-    this.y = y;
+    super(x, y, 20, 28);
 
-    //Collision box
-    this.width = 20;
-    this.height = 28;
-
-    //Player dimensions
     this.spriteWidth = 32;
     this.spriteHeight = 32;
 
     this.speed = 100;
     this.jumpStrength = 300;
-
-    this.velocityX = 0;
-    this.velocityY = 0;
-
-    this.gravity = 800;
-
-    this.isGrounded = false;
 
     this.isRolling = false;
     this.rollSpeed = 180;
@@ -32,6 +19,13 @@ class Player {
     this.attackRange = 24;
     this.hasHitEnemy = false;
 
+    this.maxHealth = 100;
+    this.health = this.maxHealth;
+
+    this.isInvulnerable = false;
+    this.invDuration = 0.75;
+    this.invTimer = 0;
+    
     this.facingDir = 1;
 
     this.image = new Image();
@@ -42,8 +36,6 @@ class Player {
   }
 
   update(deltaTime, input, platforms) {
-    const previousY = this.y;
-
     if (!this.isRolling) {
       this.velocityX = 0;
 
@@ -67,7 +59,19 @@ class Player {
         this.attackTimer = this.attackDuration;
         this.hasHitEnemy = false;
       }
+
     }
+
+    this.updatePhysics(deltaTime, platforms);
+
+    this.x = Math.max(
+        0,
+        Math.min(
+            this.x,
+            320 - this.width
+        )
+    );
+
 
     if (
       input.isJustPressed("ShiftLeft") &&
@@ -77,25 +81,6 @@ class Player {
       this.isRolling = true;
       this.velocityX = this.facingDir * this.rollSpeed;
       this.setAnimation("roll");
-    }
-
-    if (!this.isGrounded) {
-      this.velocityY += this.gravity * deltaTime;
-    }
-
-    this.x += this.velocityX * deltaTime;
-    this.y += this.velocityY * deltaTime;
-
-    this.x = Math.max(0, Math.min(this.x, 320 - this.width));
-
-    this.isGrounded = false;
-
-    for (const platform of platforms) {
-      if (this.checkPlatformCollison(platform, previousY)) {
-        this.y = platform.y - this.height;
-        this.velocityY = 0;
-        this.isGrounded = true;
-      }
     }
 
     if (this.isAttacking) {
@@ -126,6 +111,33 @@ class Player {
     if (this.isRolling && this.animations.roll.isFinished()) {
       this.isRolling = false;
     }
+
+    if (this.isInvulnerable) {
+      this.invTimer -= deltaTime;
+
+      if (this.invTimer <= 0) {
+        this.invTimer = 0;
+        this.isInvulnerable = false;
+      }
+    }
+  }
+
+  takeDamage(amount) {
+    if (this.isInvulnerable) {
+      return;
+    }
+
+    this.health -= amount;
+
+    if (this.health < 0) {
+      health = 0;
+    }
+
+    this.isInvulnerable = true;
+    this.invTimer = this.invDuration;
+
+    console.log(this.health);
+
   }
 
   getAttackHitbox() {
@@ -161,18 +173,6 @@ class Player {
         attackBox.y < enemy.y + enemy.height &&
         attackBox.y + attackBox.height > enemy.y
     );
-  }
-  checkPlatformCollison(platform, previousY) {
-    const previousBottom = previousY + this.height;
-    const currentBottom = this.y + this.height;
-
-    const horizontalOverlap =
-      this.x < platform.x + platform.width && this.x + this.width > platform.x;
-
-    const crossedPlatform =
-      previousBottom <= platform.y && currentBottom >= platform.y;
-
-    return this.velocityY >= 0 && horizontalOverlap && crossedPlatform;
   }
 
   setAnimation(name) {

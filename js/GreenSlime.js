@@ -15,6 +15,9 @@ class GreenSlime extends Enemy {
     this.hitDuration = 0.2;
     this.knockbackSpeed = 80;
 
+    this.damageCooldown = 0;
+    this.dcDuration = 0.75;
+
     this.image = new Image();
     this.image.src = "assests/sprites/slime_green.png";
 
@@ -64,6 +67,10 @@ class GreenSlime extends Enemy {
   }
 
   update(deltaTime, platforms, player) {
+
+    if (this.damageCooldown > 0) {
+      this.damageCooldown -= deltaTime;
+    }
 
     if (this.isDead) {
       this.velocityX = 0;
@@ -191,7 +198,7 @@ class GreenSlime extends Enemy {
     );
 }
 
-  canDetectPlayer(player) {
+canDetectPlayer(player) {
     const slimeCenterX = this.x + this.width / 2;
 
     const slimeCenterY = this.y + this.height / 2;
@@ -207,6 +214,15 @@ class GreenSlime extends Enemy {
     return (
       Math.abs(distanceX) <= this.detectionRange &&
       Math.abs(distanceY) <= this.detectionRange
+    );
+  }
+
+  isTouchingPlayer(player) {
+    return (
+      this.x < player.x + player.width &&
+      this.x + this.width > player.x &&
+      this.y < player.y + player.height &&
+      this.y + this.height > player.y 
     );
   }
 

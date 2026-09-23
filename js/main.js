@@ -38,6 +38,12 @@ async function startGame() {
           slime.takeDamage(player.attackDamage, player.facingDir);
           player.hasHitEnemy = true;
         }
+
+        if (!slime.isDead && slime.damageCooldown <= 0 && slime.isTouchingPlayer(player)) {
+          player.takeDamage(slime.damage);
+
+          slime.damageCooldown = slime.dcDuration;
+        }
       },
 
       draw() {
