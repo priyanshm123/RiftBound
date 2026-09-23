@@ -76,6 +76,35 @@ function createPlayerAnimations(image) {
                 ],
                 0.06,
                 false
+        ),
+
+        hit: new Animation(
+            image,
+            32,
+            32,
+            [
+                [0, 6],
+                [1, 6],
+                [2, 6],
+                [3, 6]
+            ],
+            0.05,
+            false
+        ),
+
+        death: new Animation(
+            image,
+            32,
+            32,
+            [
+                [0, 7],
+                [1, 7],
+                [2, 7],
+                [3, 7]
+            ],
+            0.1,
+            false
         )
     };
+
 }

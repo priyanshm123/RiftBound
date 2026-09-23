@@ -25,6 +25,17 @@ class Player extends Entity {
     this.isInvulnerable = false;
     this.invDuration = 0.75;
     this.invTimer = 0;
+
+    this.isHurt = false;
+    this.hurtTimer = 0;
+    this.hurtDuration = 0.2;
+
+    this.hurtKB = 100;
+
+    this.isDead = false;
+
+    this.deathTimer = 0;
+    this.deathDuration = 0.4;
     
     this.facingDir = 1;
 
@@ -36,6 +47,39 @@ class Player extends Entity {
   }
 
   update(deltaTime, input, platforms) {
+
+    if (this.isDead) {
+      this.velocityX = 0;
+      this.velocityY = 0;
+
+      this.setAnimation("death");
+      this.animations.death.update(deltaTime);
+
+      this.deathTimer += deltaTime;
+      return;
+    }
+
+    if (this.isHurt) {
+      this.hurtTimer -= deltaTime;
+
+      this.velocityX *= 0.9;
+
+      this.updatePhysics(deltaTime, platforms);
+            
+      this.setAnimation("hit");
+
+
+      this.animations[this.currentAnimation].update(deltaTime);
+
+      if (this.hurtTimer <= 0) {
+        this.hurtTimer = 0;
+        this.isHurt = false;
+        this.velocityX = 0;
+      }
+
+      return;
+    }
+
     if (!this.isRolling) {
       this.velocityX = 0;
 
@@ -71,7 +115,6 @@ class Player extends Entity {
             320 - this.width
         )
     );
-
 
     if (
       input.isJustPressed("ShiftLeft") &&
@@ -122,21 +165,29 @@ class Player extends Entity {
     }
   }
 
-  takeDamage(amount) {
-    if (this.isInvulnerable) {
+  takeDamage(amount, damageDirection) {
+    if (this.isInvulnerable || this.isDead) {
       return;
     }
 
     this.health -= amount;
 
     if (this.health < 0) {
-      health = 0;
+      this.health = 0;
+      this.isDead = true;
+      this.isHurt = false;
+      this.isRolling = false;
+      return;
     }
 
     this.isInvulnerable = true;
     this.invTimer = this.invDuration;
 
-    console.log(this.health);
+    this.isHurt = true;
+    this.hurtTimer = this.hurtDuration;
+
+    this.velocityX = damageDirection * this.hurtKB;
+    this.velocityY = -80;
 
   }
 

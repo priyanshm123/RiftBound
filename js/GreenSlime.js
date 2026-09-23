@@ -16,7 +16,7 @@ class GreenSlime extends Enemy {
     this.knockbackSpeed = 80;
 
     this.damageCooldown = 0;
-    this.dcDuration = 0.75;
+    this.dcDuration = 0.5;
 
     this.image = new Image();
     this.image.src = "assests/sprites/slime_green.png";
@@ -196,9 +196,9 @@ class GreenSlime extends Enemy {
         Math.abs(slimeCenterY - playerCenterY) <=
             this.verticalTolerance
     );
-}
+  }
 
-canDetectPlayer(player) {
+  canDetectPlayer(player) {
     const slimeCenterX = this.x + this.width / 2;
 
     const slimeCenterY = this.y + this.height / 2;
@@ -218,11 +218,25 @@ canDetectPlayer(player) {
   }
 
   isTouchingPlayer(player) {
+    const slimeBox = {
+        x: this.x + 2,
+        y: this.y + 2,
+        width: this.width - 4,
+        height: this.height - 2
+    };
+
+    const playerBox = {
+        x: player.x + 2,
+        y: player.y + 2,
+        width: player.width - 4,
+        height: player.height - 2
+    };
+
     return (
-      this.x < player.x + player.width &&
-      this.x + this.width > player.x &&
-      this.y < player.y + player.height &&
-      this.y + this.height > player.y 
+        slimeBox.x < playerBox.x + playerBox.width &&
+        slimeBox.x + slimeBox.width > playerBox.x &&
+        slimeBox.y < playerBox.y + playerBox.height &&
+        slimeBox.y + slimeBox.height > playerBox.y
     );
   }
 

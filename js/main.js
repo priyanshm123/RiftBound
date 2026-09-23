@@ -40,7 +40,8 @@ async function startGame() {
         }
 
         if (!slime.isDead && slime.damageCooldown <= 0 && slime.isTouchingPlayer(player)) {
-          player.takeDamage(slime.damage);
+          const damageDirection = player.x < slime.x ?-1 : 1;
+          player.takeDamage(slime.damage, damageDirection);
 
           slime.damageCooldown = slime.dcDuration;
         }
