@@ -6,6 +6,13 @@ context.imageSmoothingEnabled = false;
 canvas.width = 320;
 canvas.height = 180;
 
+const restartButton = {
+  x: 120,
+  y: 105,
+  width: 80,
+  height: 24,
+};
+
 async function startGame() {
   try {
     const response = await fetch("assests/data/tiles.json");
@@ -24,10 +31,19 @@ async function startGame() {
 
     const slime = new GreenSlime(180, 123);
 
+    let gameState = "playing";
+
     const game = {
       lastTime: 0,
 
       update(deltaTime) {
+        if (gameState === "gameOver") {
+          if (input.isJustPressed("KeyR")) {
+            location.reload();
+          }
+          return;
+        }
+
         player.update(deltaTime, input, room.platforms);
 
         if (!slime.isDead) {
@@ -39,11 +55,19 @@ async function startGame() {
           player.hasHitEnemy = true;
         }
 
-        if (!slime.isDead && slime.damageCooldown <= 0 && slime.isTouchingPlayer(player)) {
-          const damageDirection = player.x < slime.x ?-1 : 1;
+        if (
+          !slime.isDead &&
+          slime.damageCooldown <= 0 &&
+          slime.isTouchingPlayer(player)
+        ) {
+          const damageDirection = player.x < slime.x ? -1 : 1;
           player.takeDamage(slime.damage, damageDirection);
 
           slime.damageCooldown = slime.dcDuration;
+        }
+
+        if (player.isDead && player.animations.death.isFinished()) {
+          gameState = "gameOver";
         }
       },
 
@@ -52,11 +76,65 @@ async function startGame() {
 
         room.draw(context);
         player.draw(context);
-        if(!slime.isDead) {
+        if (!slime.isDead) {
           slime.draw(context);
+        }
+
+        if (gameState === "gameOver") {
+          context.fillStyle = "rgba(0, 0, 0, 0.6)";
+          context.fillRect(0, 0, canvas.width, canvas.height);
+
+          context.fillStyle = "RED";
+          context.textAlign = "center";
+          context.font = "20px PixelOperator";
+
+          context.fillText("GAME OVER", canvas.width / 2, canvas.height / 2);
+
+          context.fillStyle = "#333";
+          context.fillRect(
+            restartButton.x,
+            restartButton.y,
+            restartButton.width,
+            restartButton.height,
+          );
+
+          context.strokeStyle = "white";
+          context.strokeRect(
+            restartButton.x,
+            restartButton.y,
+            restartButton.width,
+            restartButton.height,
+          );
+
+          context.fillStyle = "white";
+          context.font = "10px PixelOperator";
+
+          context.fillText("RESTART", canvas.width / 2, restartButton.y + 16);
         }
       },
     };
+
+    canvas.addEventListener("click", (event) => {
+      if (gameState !== "gameOver") {
+        return;
+      }
+
+      const rect = canvas.getBoundingClientRect();
+
+      const mouseX = (event.clientX - rect.left) * (canvas.width / rect.width);
+
+      const mouseY = (event.clientY - rect.top) * (canvas.height / rect.height);
+
+      const clicked =
+        mouseX >= restartButton.x &&
+        mouseX <= restartButton.x + restartButton.width &&
+        mouseY >= restartButton.y &&
+        mouseY <= restartButton.y + restartButton.height;
+
+      if (clicked) {
+        location.reload();
+      }
+    });
 
     function gameLoop(currentTime) {
       const deltaTime =
