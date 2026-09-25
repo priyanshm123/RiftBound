@@ -17,6 +17,19 @@ class Room {
             x: template.playerSpawn.x * this.tileSize,
             y: template.playerSpawn.y * this.tileSize
         };
+
+        this.enemies = [];
+
+        for (const enemyData of template.enemies || []) {
+            if (enemyData.type === "greenSlime") {
+                this.enemies.push(
+                    new GreenSlime(
+                        enemyData.x,
+                        enemyData.y
+                    )
+                );
+            }
+        }
     }
 
     createTileMap() {

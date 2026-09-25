@@ -29,8 +29,6 @@ async function startGame() {
 
     const player = new Player(room.playerSpawn.x, room.playerSpawn.y);
 
-    const slime = new GreenSlime(180, 123);
-
     let gameState = "playing";
 
     const game = {
@@ -46,24 +44,29 @@ async function startGame() {
 
         player.update(deltaTime, input, room.platforms);
 
-        if (!slime.isDead) {
-          slime.update(deltaTime, room.platforms, player);
-        }
+        for (const enemy of room.enemies) {
+          if (!enemy.isDead) {
+            enemy.update(deltaTime, room.platforms, player);
+          }
 
-        if (player.isAttackingEnemy(slime) && !player.hasHitEnemy) {
-          slime.takeDamage(player.attackDamage, player.facingDir);
-          player.hasHitEnemy = true;
-        }
+          if (!enemy.isDead && 
+            player.isAttackingEnemy(enemy) && 
+            !player.hasHitEnemy.has(enemy)) {
+            enemy.takeDamage(player.attackDamage, player.facingDir);
+            player.hasHitEnemy.add(enemy);
+          }
 
-        if (
-          !slime.isDead &&
-          slime.damageCooldown <= 0 &&
-          slime.isTouchingPlayer(player)
-        ) {
-          const damageDirection = player.x < slime.x ? -1 : 1;
-          player.takeDamage(slime.damage, damageDirection);
+          if (
+            !enemy.isDead &&
+            enemy.damageCooldown <= 0 &&
+            enemy.isTouchingPlayer(player)
+          ) {
+            const damageDirection = player.x < enemy.x ? -1 : 1;
+            player.takeDamage(enemy.damage, damageDirection);
 
-          slime.damageCooldown = slime.dcDuration;
+            enemy.damageCooldown = enemy.dcDuration;
+          }
+
         }
 
         if (player.isDead && player.animations.death.isFinished()) {
@@ -76,8 +79,11 @@ async function startGame() {
 
         room.draw(context);
         player.draw(context);
-        if (!slime.isDead) {
-          slime.draw(context);
+        
+        for (const enemy of room.enemies) {
+          if (!enemy.isDead) {
+            enemy.draw(context);
+          }
         }
 
         if (gameState === "gameOver") {

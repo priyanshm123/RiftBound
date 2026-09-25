@@ -17,7 +17,7 @@ class Player extends Entity {
 
     this.attackDamage = 10;
     this.attackRange = 24;
-    this.hasHitEnemy = false;
+    this.hasHitEnemy = new Set();
 
     this.maxHealth = 100;
     this.health = this.maxHealth;
@@ -101,7 +101,7 @@ class Player extends Entity {
       if (input.isJustPressed("KeyX") && !this.isAttacking) {
         this.isAttacking = true;
         this.attackTimer = this.attackDuration;
-        this.hasHitEnemy = false;
+        this.hasHitEnemy.clear();
       }
 
     }
