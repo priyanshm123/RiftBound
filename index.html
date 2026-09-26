@@ -1,34 +1,43 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>RiftBound</title>
 
-    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="css/menu.css">
+</head>
 
-    <script src="js/Input.js" defer></script>
+<body>
 
-    <script src="js/Animation.js" defer></script>
-    <script src="js/PlayerAnimations.js" defer></script>
+    <div class="screen">
 
-    <script src="js/Entity.js" defer></script>
-    <script src="js/Enemy.js" defer></script>
-    <script src="js/GreenSlime.js" defer></script>
+        <div class="menu">
 
-    <script src="js/Player.js" defer></script>
-    <script src="js/Platform.js" defer></script>
-    <script src="js/RoomTemplates.js" defer></script>
-    <script src="js/Room.js" defer></script>
+            <h1>RIFTBOUND</h1>
 
-    <script src="js/main.js" defer></script>
-    
-  </head>
+            <p class="subtitle">A Pixel-Action Adventure</p>
 
-  <body>
-    <main>
-      <canvas id="gameCanvas"></canvas>
-    </main>
-  </body>
+            <button id="playButton">PLAY</button>
+
+            <div class="controls">
+                <p>ARROW KEYS — MOVE</p>
+                <p>SPACE — JUMP</p>
+                <p>X — ATTACK</p>
+                <p>SHIFT — ROLL</p>
+            </div>
+
+        </div>
+
+    </div>
+
+    <script>
+        document
+            .getElementById("playButton")
+            .addEventListener("click", () => {
+                window.location.href = "game.html";
+            });
+    </script>
+
+</body>
 </html>

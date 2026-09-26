@@ -25,11 +25,21 @@ async function startGame() {
 
     const input = new Input();
 
-    const room = new Room(ROOM_TEMPLATES[0], tiles);
+    let currentRoomIndex = 0;
 
-    const player = new Player(room.playerSpawn.x, room.playerSpawn.y);
+    let room = new Room(ROOM_TEMPLATES[currentRoomIndex], tiles);
+
+    let player = new Player(room.playerSpawn.x, room.playerSpawn.y);
 
     let gameState = "playing";
+
+    function loadRoom(index) {
+      currentRoomIndex = index;
+
+      room = new Room(ROOM_TEMPLATES[currentRoomIndex], tiles);
+
+      player = new Player(room.playerSpawn.x, room.playerSpawn.y);
+    }
 
     const game = {
       lastTime: 0,
@@ -49,9 +59,11 @@ async function startGame() {
             enemy.update(deltaTime, room.platforms, player);
           }
 
-          if (!enemy.isDead && 
-            player.isAttackingEnemy(enemy) && 
-            !player.hasHitEnemy.has(enemy)) {
+          if (
+            !enemy.isDead &&
+            player.isAttackingEnemy(enemy) &&
+            !player.hasHitEnemy.has(enemy)
+          ) {
             enemy.takeDamage(player.attackDamage, player.facingDir);
             player.hasHitEnemy.add(enemy);
           }
@@ -66,7 +78,24 @@ async function startGame() {
 
             enemy.damageCooldown = enemy.dcDuration;
           }
+        }
 
+        if (room.isCleared()) {
+          const exit = room.exit;
+
+          const touchingExit =
+            player.x < exit.x + exit.width &&
+            player.x + player.width > exit.x &&
+            player.y < exit.y + exit.height &&
+            player.y + player.height > exit.y;
+
+          if (touchingExit) {
+            if (currentRoomIndex < ROOM_TEMPLATES.length - 1) {
+              loadRoom(currentRoomIndex + 1);
+            } else {
+              gameState = "won";
+            }
+          }
         }
 
         if (player.isDead && player.animations.death.isFinished()) {
@@ -79,11 +108,19 @@ async function startGame() {
 
         room.draw(context);
         player.draw(context);
-        
+
         for (const enemy of room.enemies) {
           if (!enemy.isDead) {
             enemy.draw(context);
           }
+        }
+
+        if (room.isCleared()) {
+          context.fillStyle = "white";
+          context.textAlign = "center";
+          context.font = "12px PixelOperator";
+
+          context.fillText("ROOM CLEARED", canvas.width / 2, 25);
         }
 
         if (gameState === "gameOver") {
@@ -116,6 +153,17 @@ async function startGame() {
           context.font = "10px PixelOperator";
 
           context.fillText("RESTART", canvas.width / 2, restartButton.y + 16);
+        }
+
+        if (gameState === "won") {
+          context.fillStyle = "rgba(0, 0, 0, 0.6)";
+          context.fillRect(0, 0, canvas.width, canvas.height);
+
+          context.fillStyle = "white";
+          context.textAlign = "center";
+          context.font = "20px PixelOperator";
+
+          context.fillText("YOU WIN!", canvas.width / 2, canvas.height / 2);
         }
       },
     };

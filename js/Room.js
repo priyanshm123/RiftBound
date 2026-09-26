@@ -1,115 +1,142 @@
 class Room {
-    constructor(template, tiles) {
-        this.template = template;
-        this.tiles = tiles;
+  constructor(template, tiles) {
+    this.template = template;
+    this.tiles = tiles;
 
-        this.width = ROOM_WIDTH;
-        this.height = ROOM_HEIGHT;
-        this.tileSize = TILE_SIZE;
+    this.width = ROOM_WIDTH;
+    this.height = ROOM_HEIGHT;
+    this.tileSize = TILE_SIZE;
 
-        this.image = new Image();
-        this.image.src = "assests/sprites/world_tileset.png";
+    this.image = new Image();
+    this.image.src = "assests/sprites/world_tileset.png";
 
-        this.tileMap = this.createTileMap();
-        this.platforms = this.createPlatforms();
+    this.doorClosed = new Image();
+    this.doorClosed.src = "assests/sprites/door_closed.png";
 
-        this.playerSpawn = {
-            x: template.playerSpawn.x * this.tileSize,
-            y: template.playerSpawn.y * this.tileSize
-        };
+    this.doorOpen = new Image();
+    this.doorOpen.src = "assests/sprites/door_open.png";
 
-        this.enemies = [];
+    this.tileMap = this.createTileMap();
+    this.platforms = this.createPlatforms();
 
-        for (const enemyData of template.enemies || []) {
-            if (enemyData.type === "greenSlime") {
-                this.enemies.push(
-                    new GreenSlime(
-                        enemyData.x,
-                        enemyData.y
-                    )
-                );
-            }
-        }
+    this.playerSpawn = {
+      x: template.playerSpawn.x * this.tileSize,
+      y: template.playerSpawn.y * this.tileSize,
+    };
+
+    this.exit = {
+      x: template.exit.x * this.tileSize,
+      y: template.exit.y * this.tileSize,
+      width: template.exit.width * this.tileSize,
+      height: template.exit.height * this.tileSize,
+    };
+
+    this.enemies = [];
+
+    for (const enemyData of template.enemies || []) {
+      if (enemyData.type === "greenSlime") {
+        this.enemies.push(new GreenSlime(enemyData.x, enemyData.y));
+      }
+    }
+  }
+
+  createTileMap() {
+    const map = Array.from({ length: this.height }, () =>
+      Array(this.width).fill(this.tiles.empty),
+    );
+
+    const ground = this.template.ground;
+
+    for (let x = 0; x < this.width; x++) {
+      map[ground.row][x] = this.tiles[ground.top];
+
+      for (let y = ground.row + 1; y < this.height; y++) {
+        const fillIndex = (y - ground.row - 1) % ground.fill.length;
+
+        map[y][x] = this.tiles[ground.fill[fillIndex]];
+      }
     }
 
-    createTileMap() {
-        const map = Array.from(
-            { length: this.height },
-            () => Array(this.width).fill(this.tiles.empty)
+    return map;
+  }
+
+  createPlatforms() {
+    const ground = this.template.ground;
+
+    const platforms = [
+      new Platform(
+        0,
+        ground.row * this.tileSize,
+        this.width * this.tileSize,
+        this.tileSize,
+      ),
+    ];
+
+    for (const data of this.template.platforms) {
+      platforms.push(
+        new Platform(
+          data.x * this.tileSize,
+          data.y * this.tileSize,
+          data.width * this.tileSize,
+          this.tileSize,
+        ),
+      );
+    }
+
+    return platforms;
+  }
+
+  isCleared() {
+    return this.enemies.every((enemy) => enemy.isDead);
+  }
+
+  drawExit(context) {
+    const image = this.isCleared() ? this.doorOpen : this.doorClosed;
+
+    if (!image.complete || image.naturalWidth === 0) {
+      return;
+    }
+
+    const doorWidth = image.naturalWidth;
+    const doorHeight = image.naturalHeight;
+
+    const doorX = this.exit.x + (this.exit.width - doorWidth) / 2;
+
+    const doorY = this.exit.y + this.exit.height - doorHeight;
+
+    context.drawImage(image, doorX, doorY, doorWidth, doorHeight);
+  }
+
+  draw(context) {
+    for (let y = 0; y < this.height; y++) {
+      for (let x = 0; x < this.width; x++) {
+        const tile = this.tileMap[y][x];
+
+        if (tile === this.tiles.empty) {
+          continue;
+        }
+
+        const sourceColumn = tile % 16;
+        const sourceRow = Math.floor(tile / 16);
+
+        context.drawImage(
+          this.image,
+          sourceColumn * 16,
+          sourceRow * 16,
+          16,
+          16,
+          x * this.tileSize,
+          y * this.tileSize,
+          this.tileSize,
+          this.tileSize,
         );
-
-        const ground = this.template.ground;
-
-        for (let x = 0; x < this.width; x++) {
-            map[ground.row][x] = this.tiles[ground.top];
-
-            for (let y = ground.row + 1; y < this.height; y++) {
-                const fillIndex =
-                    (y - ground.row - 1) % ground.fill.length;
-
-                map[y][x] = this.tiles[
-                    ground.fill[fillIndex]
-                ];
-            }
-        }
-
-        return map;
+      }
     }
 
-    createPlatforms() {
-        const ground = this.template.ground;
-
-        const platforms = [
-            new Platform(
-                0,
-                ground.row * this.tileSize,
-                this.width * this.tileSize,
-                this.tileSize
-            )
-        ];
-
-        for (const data of this.template.platforms) {
-            platforms.push(
-                new Platform(
-                    data.x * this.tileSize,
-                    data.y * this.tileSize,
-                    data.width * this.tileSize,
-                    this.tileSize
-                )
-            );
-        }
-
-        return platforms;
+    for (const platform of this.platforms) {
+      platform.draw(context);
     }
 
-    draw(ctx) {
-        for (let y = 0; y < this.height; y++) {
-            for (let x = 0; x < this.width; x++) {
-                const tile = this.tileMap[y][x];
-
-                if (tile === this.tiles.empty) {
-                    continue;
-                }
-
-                const sourceColumn = tile % 16;
-                const sourceRow = Math.floor(tile / 16);
-
-                ctx.drawImage(
-                    this.image,
-                    sourceColumn * 16,
-                    sourceRow * 16,
-                    16,
-                    16,
-                    x * this.tileSize,
-                    y * this.tileSize,
-                    this.tileSize,
-                    this.tileSize
-                );
-            }
-        }
-
-        for (const platform of this.platforms) {
-            platform.draw(ctx);
-        }
-    }
+    this.drawExit(context);
+  }
 }

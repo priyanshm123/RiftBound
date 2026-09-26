@@ -39,6 +39,13 @@ const ROOM_TEMPLATES = [
         y: 92,
       },
     ],
+
+    exit: {
+      x: 18,
+      y: 7,
+      width: 2,
+      height: 2,
+    },
   },
 
   {
@@ -60,6 +67,31 @@ const ROOM_TEMPLATES = [
       x: 2,
       y: 7,
     },
+
+    enemies: [
+      {
+        type: "greenSlime",
+        x: 60,
+        y: 92,
+      },
+      {
+        type: "greenSlime",
+        x: 150,
+        y: 76,
+      },
+      {
+        type: "greenSlime",
+        x: 240,
+        y: 92,
+      },
+    ],
+
+    exit: {
+      x: 18,
+      y: 7,
+      width: 2,
+      height: 2,
+    },
   },
 
   {
@@ -80,6 +112,31 @@ const ROOM_TEMPLATES = [
     playerSpawn: {
       x: 2,
       y: 7,
+    },
+
+    enemies: [
+      {
+        type: "greenSlime",
+        x: 75,
+        y: 92,
+      },
+      {
+        type: "greenSlime",
+        x: 150,
+        y: 60,
+      },
+      {
+        type: "greenSlime",
+        x: 240,
+        y: 76,
+      },
+    ],
+
+    exit: {
+      x: 18,
+      y: 7,
+      width: 2,
+      height: 2,
     },
   },
 ];
